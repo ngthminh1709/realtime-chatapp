@@ -1,5 +1,4 @@
-const express = require("express");
-// const User = require() ;
+const User = require('../models/user_model') ;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
@@ -17,6 +16,7 @@ const AuthController = {
     const salt = await bcrypt.genSalt(10);
     const password = await bcrypt.hash(plainTextPassword, salt);
     //Create a new user
+
     try {
       if (!username || !email) {
         return res
@@ -71,7 +71,7 @@ const AuthController = {
 
   generateVerifyToken: (user) => {
     return jwt.sign(
-      {
+      { 
         id: user._id,
         role: user.role,
       },

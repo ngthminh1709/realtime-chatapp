@@ -3,15 +3,21 @@ const methodOverride = require("method-override");
 const expressEjsExtend = require("express-ejs-extend");
 const bodyParser = require("body-parser");
 const route = require("./routes");
+const dotenv = require("dotenv");
+
+const db = require("./utils/connectDB");
 const app = express();
 const port = 3000;
 
+dotenv.config();
 
-// configViewEngine(app);
+db.connect();
 
 app.engine("ejs", expressEjsExtend);
 app.set("view engine", "ejs");
 app.set("views", "./src/views");
+
+app.use(express.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
