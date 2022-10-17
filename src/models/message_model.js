@@ -16,10 +16,10 @@ let MessageSchema = new Schema({
     text: String,
     file: { data: Buffer, contentType: String, filename: String },
     status: { type: Boolean, default: false },
-    createAt: { type: Number, default: Date.now },
-    updateAt: { type: Number, default: null },
     deleteAt: { type: Number, default: null }
 
+}, {
+    timestamps: true
 })
 
 module.exports = mongoose.model('message', MessageSchema)

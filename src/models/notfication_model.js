@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 let Schema = mongoose.Schema;
 
@@ -19,7 +19,8 @@ let NotficationSchema = new Schema({
         type: Boolean,
         default: false
     },
-    createAt: { type: Number, default: Date.now },
+}, {
+    timestamps: true
 })
 
 module.exports = mongoose.model('notfication', NotficationSchema)

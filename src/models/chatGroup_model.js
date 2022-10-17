@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 let Schema = mongoose.Schema;
 
@@ -10,10 +10,10 @@ let ChatGroupSchema = new Schema({
     members: [
         { userId: String }
     ],
-    createAt: { type: Number, default: Date.now },
-    updateAt: { type: Number, default: null },
     deleteAt: { type: Number, default: null }
 
+}, {
+    timestamps: true
 })
 
 module.exports = mongoose.model('chatgroup', ChatGroupSchema)

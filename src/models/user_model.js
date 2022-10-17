@@ -28,9 +28,8 @@ let UserSchema = new Schema({
     email: { type: String, trim: true, unique: true },
   },
 
-  createAt: { type: Number, default: Date.now },
-  updateAt: { type: Number, default: null },
-  deleteAt: { type: Number, default: null },
-});
+    deleteAt: { type: Number, default: null }
 
-module.exports = mongoose.model("user", UserSchema);
+}, {
+    timestamps: true
+})
