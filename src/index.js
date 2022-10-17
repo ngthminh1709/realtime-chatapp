@@ -2,31 +2,31 @@ const express = require("express");
 const methodOverride = require("method-override");
 const expressEjsExtend = require("express-ejs-extend");
 const bodyParser = require("body-parser");
+const route = require("./routes");
+const dotenv = require("dotenv");
+
+const db = require("./utils/connectDB");
 const app = express();
 const port = 3000;
 
-
-// configViewEngine(app);
+dotenv.config();
+db.connect();
 
 app.engine("ejs", expressEjsExtend);
-app.use(express.static('./src/public'));
+
+app.use(express.static('./src/public'))
 app.set("view engine", "ejs");
 app.set("views", "./src/views");
+
+app.use(express.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(methodOverride("_method"));
-app.get("/", (req, res) => {
-  return res.render("main");
-});
 
-app.get("/login", (req, res) => {
-  return res.render("auth/login");
-});
+route(app);
 
-app.get("/register", (req, res) => {
-  return res.render("auth/register");
-});
+
 
 app.listen(port, () => {
   console.log("Server is running at: " + port);
