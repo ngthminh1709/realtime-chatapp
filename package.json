@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/ngthminh1709/realtime-chatapp#readme",
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -31,6 +32,7 @@
     "method-override": "^3.0.0",
     "mongoose": "^6.6.5",
     "mongoose-slug-generator": "^1.0.4",
+    "nodemailer": "^6.8.0",
     "nodemon": "^2.0.20",
     "path": "^0.12.7"
   },
