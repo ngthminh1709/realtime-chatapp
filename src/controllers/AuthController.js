@@ -1,13 +1,13 @@
-const User = require('../models/user_model') ;
+const User = require("../models/user_model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 const AuthController = {
-  register: async (req, res) => {
+  registerPage: async (req, res) => {
     return res.render("auth/register");
   },
 
-  login: async (req, res) => {
+  loginPage: async (req, res) => {
     return res.render("auth/login");
   },
 
@@ -69,13 +69,47 @@ const AuthController = {
     }
   },
 
+  loginUser: async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+      const user = await User.findOne({ email }).lean();
+
+      if (!user) {
+        return res.status(404).json("Ivalid email!");
+      }
+
+      const validPassword = await bcrypt.compare(password, user.password);
+
+      if (!validPassword) {
+        return res.status(404).json("Wrong Password!");
+      }
+
+      if (user && validPassword) {
+        const verifyToken = AuthController.generateVerifyToken(user);
+
+        const loggedUser = await User.findByIdAndUpdate(
+          user._id,
+          {
+            $set: { local: { verifyToken } },
+          },
+          { new: true }
+        );
+        const { password, ...others } = loggedUser;
+        res.status(200).json({ success: true, user: { ...others } });
+      }
+    } catch (err) {
+      return res.status(500).json(err);
+    }
+  },
+
   generateVerifyToken: (user) => {
     return jwt.sign(
       { 
         id: user._id,
-        role: user.role,
+        role: user.username,
       },
-      process.env.ACCESS_TOKEN_SECRET,
+      process.env.VERIFY_TOKEN_SECRET,
       { expiresIn: "1h" }
     );
   },
