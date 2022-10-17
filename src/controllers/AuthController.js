@@ -39,7 +39,7 @@ const AuthController = {
           .json({ message: "Password more than 20 characters" });
       }
 
-      const currentUser = await User.findOne({ email });
+      const currentUser = await User.findOne({ "local.email": email });
 
       if (currentUser) {
         return res.status(409).json({
@@ -65,21 +65,27 @@ const AuthController = {
       });
     } catch (error) {
       console.log(error);
+
       return res.status(500).json(error);
     }
   },
 
   loginUser: async (req, res) => {
     const { email, password } = req.body;
-
+    console.log(email);
     try {
-      const user = await User.findOne({ email }).lean();
+      const user = await User.findOne({ "local.email": email });
+
+      console.log(user);
 
       if (!user) {
-        return res.status(404).json("Ivalid email!");
+        return res.status(404).json({
+          success: false,
+          message: "Ivalid email!",
+        });
       }
 
-      const validPassword = await bcrypt.compare(password, user.password);
+      const validPassword = await bcrypt.compare(password, user.local.password);
 
       if (!validPassword) {
         return res.status(404).json("Wrong Password!");
@@ -87,25 +93,24 @@ const AuthController = {
 
       if (user && validPassword) {
         const verifyToken = AuthController.generateVerifyToken(user);
+        const local = user.local;
 
         const loggedUser = await User.findByIdAndUpdate(
           user._id,
-          {
-            $set: { local: { verifyToken } },
-          },
-          { new: true }
+          { local: { ...local, verifyToken } },
+          { new: true, select: "-password" }
         );
-        const { password, ...others } = loggedUser;
-        res.status(200).json({ success: true, user: { ...others } });
+        res.status(200).json({ success: true, user: loggedUser });
       }
     } catch (err) {
+      console.log(err);
       return res.status(500).json(err);
     }
   },
 
   generateVerifyToken: (user) => {
     return jwt.sign(
-      { 
+      {
         id: user._id,
         role: user.username,
       },
