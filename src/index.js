@@ -2,6 +2,7 @@ const express = require("express");
 const methodOverride = require("method-override");
 const expressEjsExtend = require("express-ejs-extend");
 const bodyParser = require("body-parser");
+const route = require("./routes");
 const app = express();
 const port = 3000;
 
@@ -16,17 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(methodOverride("_method"));
 
-app.get("/", (req, res) => {
-  return res.render("main");
-});
-
-app.get("/login", (req, res) => {
-  return res.render("auth/login");
-});
-
-app.get("/register", (req, res) => {
-  return res.render("auth/register");
-});
+route(app);
 
 app.listen(port, () => {
   console.log("Server is running at: " + port);
