@@ -39,6 +39,9 @@
     "@babel/core": "^7.19.3",
     "@babel/node": "^7.19.1",
     "@babel/plugin-transform-runtime": "^7.19.1",
-    "@babel/preset-env": "^7.19.4"
+    "@babel/preset-env": "^7.19.4",
+    "boostrap": "^2.0.0",
+    "jquery": "^3.6.1",
+    "popper.js": "^1.16.1"
   }
 }
