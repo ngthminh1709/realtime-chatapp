@@ -42,7 +42,7 @@ const AuthController = {
           .json({ message: "Password more than 20 characters" });
       }
 
-      const currentUser = await User.findOne({ "local.?email": email });
+      const currentUser = await User.findOne({ "local.email": email });
 
       if (currentUser) {
         return res.status(409).json({
