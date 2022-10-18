@@ -15,7 +15,7 @@ const AuthController = {
   },
 
   registerNewUser: async (req, res) => {
-    const { email, username, password: plainTextPassword, gender } = req.body;
+    const { email, username, password: plainTextPassword } = req.body;
     const salt = await bcrypt.genSalt(10);
     const password = await bcrypt.hash(plainTextPassword, salt);
     //Create a new user
@@ -53,7 +53,6 @@ const AuthController = {
 
       const userItem = {
         username,
-        gender,
         local: {
           email,
           password,
