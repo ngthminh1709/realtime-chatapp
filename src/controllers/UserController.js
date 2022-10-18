@@ -5,6 +5,14 @@ const JsonSearch = require("search-array").default;
 const cloudinary = require("../configs/cloudinary");
 
 const UserController = {
+
+  userProfile: async (req, res) => {
+    const { id } = await req.params;
+    const user = await User.findById(id);
+    console.log(user);
+    return res.render('user', { user })
+  },
+
   findUserByUserName: async (req, res) => {
     const { username } = req.query;
 
