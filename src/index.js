@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const route = require("./routes");
 const dotenv = require("dotenv");
 
+const UserRouter = require('./routes/user')
+
 const db = require("./utils/connectDB");
 const app = express();
 const port = 3000;
