@@ -101,7 +101,9 @@ const AuthController = {
     const { email, password } = req.body;
     console.log(email);
     try {
-      const user = await User.findOne({ "local.email": email }) ;
+      const user = await User.findOne({ 
+        "local.email": email 
+      }) ;
 
       if (!user) {
         return res.status(404).json({
