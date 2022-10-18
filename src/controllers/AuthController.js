@@ -223,7 +223,7 @@ const AuthController = {
     return jwt.sign(
       {
         id: user._id,
-        role: user.username,
+        role: user.role,
       },
       process.env.VERIFY_TOKEN_SECRET,
       { expiresIn: "1h" }
