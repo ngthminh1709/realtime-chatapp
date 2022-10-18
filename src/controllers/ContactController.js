@@ -55,7 +55,7 @@ const ContactController = {
                 })
             }
         else
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 success: false,
                 message: "Input invalid !!!"
             })
@@ -72,7 +72,8 @@ const ContactController = {
                 const contactExists = await ContactModel.deleteOne({
                     $and: [
                         { "userId": userId },
-                        { "contactId": contactId }
+                        { "contactId": contactId },
+                        { "status": false }
                     ]
                 })
                 if (contactExists) {
@@ -85,10 +86,54 @@ const ContactController = {
                 else {
                     return res.status(StatusCodes.BAD_REQUEST).json({
                         success: false,
-                        message: "Friend request sent !!!"
+                        message: "Can't not remove user!!!"
                     })
                 }
 
+
+            } catch (error) {
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                    success: false,
+                    message: "Server is error"
+                })
+            }
+        else
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                success: false,
+                message: "Input invalid !!!"
+            })
+    },
+
+    acceptResquestContact: async (req, res) => {
+
+        const userId = req.params.id;
+        // const userId = req.user._id;
+        const contactId = req.body.id;
+
+        if (userId && contactId)
+            try {
+
+                const requestContact = await ContactModel.updateOne({
+                    $and: [
+                        { "userId": contactId },
+                        { "contactId": userId },
+                        { "status": false }
+                    ]
+                }, { "status": true })
+
+                if (requestContact) {
+                    res.status(StatusCodes.OK).json({
+                        success: true,
+                        message: "Accept friend successfully !!"
+                    })
+                }
+
+                else {
+                    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                        success: true,
+                        message: "Server is error"
+                    })
+                }
 
             } catch (error) {
                 return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -103,6 +148,5 @@ const ContactController = {
             })
     }
 }
-
 
 module.exports = ContactController;
