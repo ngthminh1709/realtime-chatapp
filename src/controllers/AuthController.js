@@ -66,7 +66,7 @@ const AuthController = {
     } catch (error) {
       console.log(error);
 
-      return res.status(500).json(error);
+      return res.status(500).json({ success: false, error });
     }
   },
 
@@ -75,8 +75,6 @@ const AuthController = {
     console.log(email);
     try {
       const user = await User.findOne({ "local.email": email });
-
-      console.log(user);
 
       if (!user) {
         return res.status(404).json({
@@ -104,7 +102,57 @@ const AuthController = {
       }
     } catch (err) {
       console.log(err);
-      return res.status(500).json(err);
+      return res.status(500).json({ success: false, err });
+    }
+  },
+
+  logout: async (req, res) => {
+    try {
+      const { id } = req.body;
+
+      const currnetUser = await User.findById(id);
+      const local = currnetUser.local;
+
+      await User.findByIdAndUpdate(
+        id,
+        { local: { ...local, verifyToken: "" } },
+        { new: true }
+      );
+
+      return res.status(200).json({ success: true, message: "Logged out!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, error });
+    }
+  },
+
+  resetPassword: async (req, res) => {
+    try {
+      const { id, oldPassword, newPassword } = req.body;
+
+      const currnetUser = await User.findById(id);
+      const local = currnetUser.local;
+
+      const checker = await bcrypt.compare(oldPassword, local.password);
+
+      if (!checker) {
+        return res
+          .status(403)
+          .json({ success: false, message: "Current password is incorrect!" });
+      }
+
+      await User.findByIdAndUpdate(
+        id,
+        { local: { ...local, password: newPassword } },
+        { new: true }
+      );
+
+      return res
+        .status(200)
+        .json({ success: true, message: "Your password update successfully!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, error });
     }
   },
 
