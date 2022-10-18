@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
 
 let Schema = mongoose.Schema;
-
-let ContactSchema = new Schema({
+const ContactSchema = new Schema({
     userId: String,
     contactId: String,
     status: { type: Boolean, default: false },
@@ -10,6 +9,8 @@ let ContactSchema = new Schema({
 
 }, {
     timestamps: true
-})
+}
+)
+
 
 module.exports = mongoose.model('contact', ContactSchema)

@@ -112,6 +112,10 @@ const AuthController = {
         });
       }
 
+      if (!user.local.isActive) {
+        return res.status(400).json({ success: false, message: "Please active your account!" });
+      }
+
       const validPassword = await bcrypt.compare(password, user.local.password);
 
       if (!validPassword) {
