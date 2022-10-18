@@ -29,7 +29,7 @@ const UserController = {
   },
 
   updateUserProfie: async (req, res) => {
-    const { id } = req.query;
+    const { id } = req.params;
     const { username, gender, phone, address, avatar } = req.body;
 
     try {
