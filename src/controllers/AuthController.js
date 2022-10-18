@@ -1,6 +1,9 @@
 const User = require("../models/user_model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+const randtoken = require("rand-token");
+const EmailToken = require("../models/cofirm_email_token_model");
 
 const AuthController = {
   registerPage: async (req, res) => {
@@ -12,7 +15,7 @@ const AuthController = {
   },
 
   registerNewUser: async (req, res) => {
-    const { email, username, password: plainTextPassword, gender } = req.body;
+    const { email, username, password: plainTextPassword } = req.body;
     const salt = await bcrypt.genSalt(10);
     const password = await bcrypt.hash(plainTextPassword, salt);
     //Create a new user
@@ -50,7 +53,6 @@ const AuthController = {
 
       const userItem = {
         username,
-        gender,
         local: {
           email,
           password,
@@ -59,9 +61,34 @@ const AuthController = {
 
       await User.create(userItem);
 
+      const token = randtoken.generate(16);
+      await EmailToken.create({ email, token });
+
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.NODEMAILE_USER,
+          pass: process.env.NODEMAILE_PASSWORD,
+        },
+      });
+
+      const options = {
+        from: "minhcloudinary@gmail.com",
+        to: email,
+        subject: "Cofirm Email To Active Account",
+        html: `<h2>Email from Realtime-Chatapp</h2><p>Ấn vào <a href="http://localhost:3000/auth/confirm-email/${token}">đây</a> để xác thực email</p>`,
+      };
+
+      transporter.sendMail(options, (err, result) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log("Mail sent successfully!");
+      });
+
       res.status(201).json({
         success: true,
-        message: "User successfully created",
+        message: "User registered, please check your email to activce account!",
       });
     } catch (error) {
       console.log(error);
@@ -74,7 +101,9 @@ const AuthController = {
     const { email, password } = req.body;
     console.log(email);
     try {
-      const user = await User.findOne({ "local.email": email });
+      const user = await User.findOne({ 
+        "local.email": email 
+      }) ;
 
       if (!user) {
         return res.status(404).json({
@@ -156,11 +185,45 @@ const AuthController = {
     }
   },
 
+  confirmEmail: async (req, res) => {
+    try {
+      const { token } = req.params;
+
+      const checker = await EmailToken.findOne({ token });
+      const email = checker.email;
+
+      if (!checker) {
+        return res.status(404).json({
+          success: false,
+          message: "Ivalid token!",
+        });
+      }
+
+      await User.findOneAndUpdate(
+        { "local.email": email },
+        {
+          $set: {
+            "local.isActive": true,
+          },
+        }
+      );
+
+      await EmailToken.findOneAndDelete({ token });
+
+      return res
+        .status(200)
+        .json({ success: true, message: "Account active successfully!" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ success: false, error });
+    }
+  },
+
   generateVerifyToken: (user) => {
     return jwt.sign(
       {
         id: user._id,
-        role: user.username,
+        role: user.role,
       },
       process.env.VERIFY_TOKEN_SECRET,
       { expiresIn: "1h" }
